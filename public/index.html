@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseFit - Full-Stack Fitness & Wellness Platform</title>
+  <meta name="description" content="Comprehensive full-stack fitness web application featuring personalized workout plans, macro diet calculator, interactive BMI meter, and progress charts.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div id="app">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">⚡</div>
+        <div class="logo-text">PulseFit</div>
+      </div>
+
+      <ul class="nav-links">
+        <li>
+          <a class="nav-item active" data-view="dashboard">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-view="bmi">
+            <i class="fa-solid fa-calculator"></i>
+            <span>BMI Calculator</span>
+          </a>
+        </li>
+        <li class="member-only-nav">
+          <a class="nav-item" data-view="workouts">
+            <i class="fa-solid fa-dumbbell"></i>
+            <span>Workout Plans</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-view="diet">
+            <i class="fa-solid fa-utensils"></i>
+            <span>Diet Plans</span>
+          </a>
+        </li>
+        <li class="member-only-nav">
+          <a class="nav-item" data-view="progress">
+            <i class="fa-solid fa-line-chart"></i>
+            <span>Progress Tracker</span>
+          </a>
+        </li>
+        <li class="member-only-nav">
+          <a class="nav-item" data-view="messages">
+            <i class="fa-solid fa-envelope"></i>
+            <span>Coach Advice</span>
+          </a>
+        </li>
+        <li class="member-only-nav">
+          <a class="nav-item" data-view="profile">
+            <i class="fa-solid fa-user"></i>
+            <span>User Profile</span>
+          </a>
+        </li>
+        <!-- Trainer Navigation Items -->
+        <li class="trainer-only-nav" style="display: none;">
+          <a class="nav-item" data-view="trainer-hub">
+            <i class="fa-solid fa-users"></i>
+            <span>Trainees Roster</span>
+          </a>
+        </li>
+        <li class="trainer-only-nav" style="display: none;">
+          <a class="nav-item" data-view="planner">
+            <i class="fa-solid fa-clipboard-list"></i>
+            <span>Workout Planner</span>
+          </a>
+        </li>
+        <li class="trainer-only-nav" style="display: none;">
+          <a class="nav-item" data-view="profile">
+            <i class="fa-solid fa-user-tie"></i>
+            <span>Trainer Profile</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="user-quick-profile">
+        <div class="user-avatar" id="sidebarUserAvatar">⚡</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarUserName">Guest User</div>
+          <div class="user-sub">Member</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Header Bar -->
+      <header class="top-header">
+        <div class="header-title-container">
+          <button class="menu-toggle" id="menuToggleBtn">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <h1 class="page-title" id="currentPageTitle">Home Dashboard</h1>
+        </div>
+
+        <div class="header-actions">
+          <div class="streak-badge">
+            <i class="fa-solid fa-fire"></i>
+            <span id="dashStreakHeader">3 Day Streak</span>
+          </div>
+          <button class="btn-auth-trigger" id="headerAuthBtn">Login / Register</button>
+        </div>
+      </header>
+
+      <!-- ==================== 1. DASHBOARD VIEW ==================== -->
+      <section class="view-section active" id="view-dashboard">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+          <div class="banner-content">
+            <h2 class="banner-title">Welcome Back, <span id="dashWelcomeName">Fitness Enthusiast</span>! 👋</h2>
+            <p class="banner-desc">Consistency is your superpower. Stay on top of your daily workouts, nutrition goals, and body composition progress today!</p>
+            <button class="btn btn-primary" id="dashQuickWorkoutBtn">
+              <i class="fa-solid fa-play"></i> Start Today's Workout
+            </button>
+          </div>
+        </div>
+
+        <!-- Metrics Stats Grid -->
+        <div class="grid-4" style="margin-bottom: 32px;">
+          <div class="glass-card stat-card">
+            <div class="stat-icon purple"><i class="fa-solid fa-weight-scale"></i></div>
+            <div>
+              <div class="stat-value" id="dashWeightValue">70 kg</div>
+              <div class="stat-label">Current Weight</div>
+            </div>
+          </div>
+
+          <div class="glass-card stat-card">
+            <div class="stat-icon cyan"><i class="fa-solid fa-fire"></i></div>
+            <div>
+              <div class="stat-value" id="dashCalorieValue">2200 kcal</div>
+              <div class="stat-label">Daily Calorie Target</div>
+            </div>
+          </div>
+
+          <div class="glass-card stat-card">
+            <div class="stat-icon emerald"><i class="fa-solid fa-heart-pulse"></i></div>
+            <div>
+              <div class="stat-value" id="dashBMIValue">22.9</div>
+              <div class="stat-label">Body Mass Index (BMI)</div>
+            </div>
+          </div>
+
+          <div class="glass-card stat-card">
+            <div class="stat-icon orange"><i class="fa-solid fa-trophy"></i></div>
+            <div>
+              <div class="stat-value" id="dashStreakValue">3 Days</div>
+              <div class="stat-label">Active Streak</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== TRAINER DASHBOARD VIEW (Hidden by default) ==================== -->
+        <div id="trainerDashboardElements" style="display: none; margin-bottom: 32px;">
+          <div class="welcome-banner" style="background: var(--grad-orange);">
+            <div class="banner-content">
+              <h2 class="banner-title">Welcome Back, <span id="dashTrainerName">Coach</span>! 👑</h2>
+              <p class="banner-desc">Manage your clients, monitor their progress, and prescribe winning fitness plans.</p>
+              <button class="btn btn-primary" style="background: #fff; color: var(--primary);" onclick="window.App.navigateTo('trainer-hub')">
+                <i class="fa-solid fa-users"></i> View Trainees Roster
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Water Tracker & Quick Quote Grid -->
+        <div class="grid-2">
+          <!-- Water Intake Widget -->
+          <div class="glass-card">
+            <div class="section-header">
+              <div>
+                <h3 class="section-title"><i class="fa-solid fa-droplet" style="color: var(--secondary);"></i> Daily Hydration Tracker</h3>
+                <p class="section-subtitle">Track your fluid intake to stay hydrated during training</p>
+              </div>
+            </div>
+
+            <div class="water-tracker-widget">
+              <div>
+                <div style="font-size: 13px; color: var(--text-muted);">Intake Progress</div>
+                <div style="font-family: var(--font-heading); font-size: 24px; font-weight:800; color: var(--secondary);" id="dashWaterValue">1.50 / 3.0 L</div>
+              </div>
+              <button class="btn btn-secondary btn-sm" id="dashAddWaterBtn">
+                <i class="fa-solid fa-plus"></i> +250 ml Water
+              </button>
+            </div>
+            <div class="water-progress-bar">
+              <div class="water-progress-fill" id="dashWaterFill" style="width: 50%;"></div>
+            </div>
+          </div>
+
+          <!-- Motivational Quote Card -->
+          <div class="glass-card" style="display:flex; flex-direction:column; justify-content:center;">
+            <div style="font-size: 32px; color: var(--primary); margin-bottom: 12px;"><i class="fa-solid fa-quote-left"></i></div>
+            <p style="font-size: 17px; font-weight: 500; font-style: italic; line-height: 1.5; color: var(--text-main);" id="dashMotivationalQuote">
+              "Small daily improvements over time lead to stunning results."
+            </p>
+            <div style="margin-top: 16px; font-size: 13px; color: var(--text-muted); font-weight:600;">— PulseFit Daily Motivation</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 2. BMI CALCULATOR VIEW ==================== -->
+      <section class="view-section" id="view-bmi">
+        <div class="grid-2">
+          <!-- Calculator Input Form -->
+          <div class="glass-card">
+            <div class="section-header">
+              <div>
+                <h2 class="section-title">BMI Calculator</h2>
+                <p class="section-subtitle">Calculate your Body Mass Index and health status</p>
+              </div>
+            </div>
+
+            <form id="bmiForm">
+              <div class="form-group">
+                <label class="form-label" for="bmiWeightInput">Weight (in Kilograms - kg)</label>
+                <input type="number" step="0.1" class="form-control" id="bmiWeightInput" placeholder="e.g. 70" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="bmiHeightInput">Height (in Centimeters - cm)</label>
+                <input type="number" step="0.1" class="form-control" id="bmiHeightInput" placeholder="e.g. 175" required>
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <i class="fa-solid fa-calculator"></i> Calculate BMI Status
+              </button>
+            </form>
+          </div>
+
+          <!-- Dynamic Meter & Analysis Card -->
+          <div class="glass-card" id="bmiResultBox" style="display:none;">
+            <div class="section-header">
+              <div>
+                <h3 class="section-title">Your BMI Result</h3>
+                <p class="section-subtitle">Based on World Health Organization standards</p>
+              </div>
+            </div>
+
+            <div class="bmi-meter-wrapper">
+              <div class="bmi-score-display" id="bmiScoreDisplay">22.9</div>
+              <span class="bmi-badge" id="bmiCategoryBadge">Normal Weight</span>
+              
+              <!-- Visual Scale Meter -->
+              <div class="bmi-bar-container">
+                <div class="bmi-bar-needle" id="bmiNeedle"></div>
+              </div>
+              <div class="bmi-scale-labels">
+                <span>Underweight (&lt;18.5)</span>
+                <span>Normal (18.5-24.9)</span>
+                <span>Overweight (25-29.9)</span>
+                <span>Obese (&gt;30)</span>
+              </div>
+            </div>
+
+            <div style="background: var(--bg-dark); padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); margin-bottom: 20px;">
+              <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 4px;">Ideal Weight Range for Height:</div>
+              <div style="font-weight: 700; color: var(--accent-green);" id="bmiIdealRangeText">56.7 kg - 76.3 kg</div>
+              
+              <div style="font-size: 13px; color: var(--text-muted); margin: 12px 0 4px 0;">Health Risk Level:</div>
+              <div style="font-weight: 600; color: var(--text-main);" id="bmiRiskText">Low Risk</div>
+
+              <div style="font-size: 13px; color: var(--text-muted); margin: 12px 0 4px 0;">Health Recommendation:</div>
+              <p style="font-size: 13px; color: var(--text-main); line-height: 1.4;" id="bmiAdviceText"></p>
+            </div>
+
+            <button class="btn btn-secondary" id="bmiSaveLogBtn" style="width: 100%;">
+              <i class="fa-solid fa-bookmark"></i> Save Result to Progress History
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 3. WORKOUT PLANS VIEW ==================== -->
+      <section class="view-section" id="view-workouts">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Workout Plans & Exercises</h2>
+            <p class="section-subtitle">Choose from structured routines tailored to your fitness targets</p>
+          </div>
+        </div>
+
+        <!-- Filter Category Tabs -->
+        <div class="filter-tabs" id="workoutTabs">
+          <button class="tab-btn active" data-category="all">All Routines</button>
+          <button class="tab-btn" data-category="hiit">⚡ HIIT & Fat Burn</button>
+          <button class="tab-btn" data-category="weight_loss">🔥 Weight Loss</button>
+          <button class="tab-btn" data-category="muscle_building">💪 Muscle Growth</button>
+          <button class="tab-btn" data-category="flexibility">🧘 Mobility & Stretch</button>
+        </div>
+
+        <!-- Workouts Grid -->
+        <div class="grid-3" id="workoutsGrid">
+          <!-- Rendered dynamically by workouts.js -->
+        </div>
+      </section>
+
+      <!-- ==================== 4. DIET PLANS VIEW ==================== -->
+      <section class="view-section" id="view-diet">
+        <div class="grid-2" style="margin-bottom: 32px;">
+          <!-- Macro Calculator Form -->
+          <div class="glass-card">
+            <div class="section-header">
+              <div>
+                <h2 class="section-title">Calorie & Macro Calculator</h2>
+                <p class="section-subtitle">Harris-Benedict formula BMR & TDEE calculation</p>
+              </div>
+            </div>
+
+            <form id="macroForm">
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="dietAgeInput">Age (Years)</label>
+                  <input type="number" class="form-control" id="dietAgeInput" value="22" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="dietGenderInput">Gender</label>
+                  <select class="form-control" id="dietGenderInput">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="dietWeightInput">Weight (kg)</label>
+                  <input type="number" step="0.1" class="form-control" id="dietWeightInput" value="70" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="dietHeightInput">Height (cm)</label>
+                  <input type="number" step="0.1" class="form-control" id="dietHeightInput" value="175" required>
+                </div>
+              </div>
+
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="dietActivityInput">Activity Level</label>
+                  <select class="form-control" id="dietActivityInput">
+                    <option value="sedentary">Sedentary (Desk Job)</option>
+                    <option value="light">Lightly Active (1-3 days/wk)</option>
+                    <option value="moderate" selected>Moderately Active (3-5 days/wk)</option>
+                    <option value="very_active">Very Active (6-7 days/wk)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="dietGoalInput">Fitness Goal</label>
+                  <select class="form-control" id="dietGoalInput">
+                    <option value="weight_loss">Weight Loss (-500 kcal)</option>
+                    <option value="muscle_gain">Muscle Building (+400 kcal)</option>
+                    <option value="maintenance">Maintenance</option>
+                  </select>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <i class="fa-solid fa-utensils"></i> Calculate Daily Macros
+              </button>
+            </form>
+          </div>
+
+          <!-- Macro Results Breakdown -->
+          <div class="glass-card" id="macroResultBox" style="display:none;">
+            <div class="section-header">
+              <div>
+                <h3 class="section-title">Macro Target Breakdown</h3>
+                <p class="section-subtitle">Recommended daily energy & macronutrient intake</p>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; text-align:center;">
+              <div style="background: var(--bg-dark); padding: 12px; border-radius: 8px; border: 1px solid var(--border-glass);">
+                <div style="font-size: 11px; color: var(--text-muted);">BMR</div>
+                <div style="font-family: var(--font-heading); font-weight:700; font-size:18px;" id="resBMR">1650 kcal</div>
+              </div>
+              <div style="background: var(--bg-dark); padding: 12px; border-radius: 8px; border: 1px solid var(--border-glass);">
+                <div style="font-size: 11px; color: var(--text-muted);">TDEE</div>
+                <div style="font-family: var(--font-heading); font-weight:700; font-size:18px;" id="resTDEE">2450 kcal</div>
+              </div>
+              <div style="background: var(--bg-dark); padding: 12px; border-radius: 8px; border: 1px solid var(--primary);">
+                <div style="font-size: 11px; color: var(--primary);">TARGET CALORIES</div>
+                <div style="font-family: var(--font-heading); font-weight:800; font-size:18px; color: white;" id="resTargetCalories">1950 kcal</div>
+              </div>
+            </div>
+
+            <div class="macro-item">
+              <div class="macro-header">
+                <span>💪 Protein (35%)</span>
+                <span id="resProteinText">170g</span>
+              </div>
+              <div class="macro-bar"><div class="macro-fill protein" id="resProteinBar" style="width: 35%;"></div></div>
+            </div>
+
+            <div class="macro-item">
+              <div class="macro-header">
+                <span>🌾 Carbohydrates (40%)</span>
+                <span id="resCarbsText">195g</span>
+              </div>
+              <div class="macro-bar"><div class="macro-fill carbs" id="resCarbsBar" style="width: 40%;"></div></div>
+            </div>
+
+            <div class="macro-item">
+              <div class="macro-header">
+                <span>🥑 Healthy Fats (25%)</span>
+                <span id="resFatText">54g</span>
+              </div>
+              <div class="macro-bar"><div class="macro-fill fat" id="resFatBar" style="width: 25%;"></div></div>
+            </div>
+
+            <button class="btn btn-secondary btn-sm" id="applyMacroGoalBtn" style="width: 100%; margin-top: 16px;">
+              <i class="fa-solid fa-check"></i> Set as My Daily Calorie Target
+            </button>
+          </div>
+        </div>
+
+        <!-- Curated Diet Plans Section -->
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Curated Meal Plans</h2>
+            <p class="section-subtitle">Sample meal blueprints customized for specific fitness objectives</p>
+          </div>
+        </div>
+
+        <div class="filter-tabs" id="dietGoalTabs">
+          <button class="tab-btn active" data-goal="all">All Plans</button>
+          <button class="tab-btn" data-goal="weight_loss">Weight Loss</button>
+          <button class="tab-btn" data-goal="muscle_gain">Muscle Growth</button>
+          <button class="tab-btn" data-goal="maintenance">Maintenance</button>
+        </div>
+
+        <div id="dietPlansContainer">
+          <!-- Rendered dynamically by diet.js -->
+        </div>
+      </section>
+
+      <!-- ==================== 5. PROGRESS TRACKER VIEW ==================== -->
+      <section class="view-section" id="view-progress">
+        <div class="grid-2" style="margin-bottom: 32px;">
+          <!-- Weight Trend Line Chart -->
+          <div class="glass-card">
+            <div class="section-header">
+              <div>
+                <h3 class="section-title"><i class="fa-solid fa-chart-line" style="color: var(--primary);"></i> Weight Trend History</h3>
+                <p class="section-subtitle">Track body weight changes over time</p>
+              </div>
+            </div>
+            <div style="height: 260px; position: relative;">
+              <canvas id="weightChartCanvas"></canvas>
+            </div>
+          </div>
+
+          <!-- Calories Burned Bar Chart -->
+          <div class="glass-card">
+            <div class="section-header">
+              <div>
+                <h3 class="section-title"><i class="fa-solid fa-fire" style="color: var(--secondary);"></i> Calorie Burn History</h3>
+                <p class="section-subtitle">Daily calories expended in workouts</p>
+              </div>
+            </div>
+            <div style="height: 260px; position: relative;">
+              <canvas id="activityChartCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Progress Log Form & History Table -->
+        <div class="grid-2">
+          <!-- Form -->
+          <div class="glass-card">
+            <div class="section-header">
+              <div>
+                <h3 class="section-title">Log Today's Progress</h3>
+                <p class="section-subtitle">Add daily weight and activity metrics</p>
+              </div>
+            </div>
+
+            <form id="progressLogForm">
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="logWeightInput">Today's Weight (kg)</label>
+                  <input type="number" step="0.1" class="form-control" id="logWeightInput" placeholder="e.g. 69.5" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="logWaterInput">Water Drank (L)</label>
+                  <input type="number" step="0.1" class="form-control" id="logWaterInput" placeholder="e.g. 2.5">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="logCaloriesInput">Calories Burned (kcal)</label>
+                <input type="number" class="form-control" id="logCaloriesInput" placeholder="e.g. 350">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="logNotesInput">Notes / Workout Log</label>
+                <input type="text" class="form-control" id="logNotesInput" placeholder="e.g. Completed 30 min HIIT & felt energized!">
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <i class="fa-solid fa-plus"></i> Save Progress Log
+              </button>
+            </form>
+          </div>
+
+          <!-- History Table -->
+          <div class="glass-card">
+            <div class="section-header">
+              <div>
+                <h3 class="section-title">Recent Activity Logs</h3>
+                <p class="section-subtitle">Chronological record of saved entries</p>
+              </div>
+            </div>
+
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                <thead>
+                  <tr style="border-bottom: 1px solid var(--border-glass); color: var(--text-muted);">
+                    <th style="padding: 10px;">Date</th>
+                    <th style="padding: 10px;">Weight</th>
+                    <th style="padding: 10px;">BMI</th>
+                    <th style="padding: 10px;">Calories</th>
+                    <th style="padding: 10px;">Notes</th>
+                  </tr>
+                </thead>
+                <tbody id="progressHistoryTbody">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 6. USER PROFILE VIEW ==================== -->
+      <section class="view-section" id="view-profile">
+        <div class="glass-card" style="max-width: 800px; margin: 0 auto;">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">User Profile & Settings</h2>
+              <p class="section-subtitle">Manage personal physical stats, goals, and account details</p>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="logoutBtn" style="color: var(--accent-rose);">
+              <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </button>
+          </div>
+
+          <form id="profileForm">
+            <!-- Avatar Selection -->
+            <div class="form-group">
+              <label class="form-label">Choose Profile Avatar</label>
+              <div class="avatar-grid" id="profileAvatarGrid">
+                <div class="avatar-option selected">⚡</div>
+                <div class="avatar-option">🏋️‍♂️</div>
+                <div class="avatar-option">🏃‍♀️</div>
+                <div class="avatar-option">🔥</div>
+                <div class="avatar-option">🧘‍♂️</div>
+                <div class="avatar-option">🎯</div>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label" for="profNameInput">Full Name</label>
+                <input type="text" class="form-control" id="profNameInput" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="profEmailInput">Email Address</label>
+                <input type="email" class="form-control" id="profEmailInput" disabled style="opacity: 0.6;">
+              </div>
+            </div>
+
+            <div class="grid-3">
+              <div class="form-group">
+                <label class="form-label" for="profAgeInput">Age</label>
+                <input type="number" class="form-control" id="profAgeInput">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="profGenderInput">Gender</label>
+                <select class="form-control" id="profGenderInput">
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="profFitnessGoalInput">Primary Goal</label>
+                <select class="form-control" id="profFitnessGoalInput">
+                  <option value="weight_loss">Weight Loss</option>
+                  <option value="muscle_gain">Muscle Building</option>
+                  <option value="maintenance">Maintenance</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid-3">
+              <div class="form-group">
+                <label class="form-label" for="profHeightInput">Height (cm)</label>
+                <input type="number" step="0.1" class="form-control" id="profHeightInput">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="profWeightInput">Current Weight (kg)</label>
+                <input type="number" step="0.1" class="form-control" id="profWeightInput">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="profTargetWeightInput">Target Weight (kg)</label>
+                <input type="number" step="0.1" class="form-control" id="profTargetWeightInput">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="profCalorieGoalInput">Daily Target Calories (kcal)</label>
+              <input type="number" class="form-control" id="profCalorieGoalInput">
+            </div>
+
+            <div id="trainerProfileFields" style="display: none;">
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="profSpecializationInput">Specialization</label>
+                  <input type="text" class="form-control" id="profSpecializationInput" placeholder="e.g. Strength & Conditioning">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="profExperienceInput">Experience (Years)</label>
+                  <input type="number" class="form-control" id="profExperienceInput" placeholder="5">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="profCertificationsInput">Certifications</label>
+                <input type="text" class="form-control" id="profCertificationsInput" placeholder="NASM, ACE, etc.">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="profBioInput">Coach Bio & Philosophy</label>
+                <textarea class="form-control" id="profBioInput" rows="3" placeholder="Tell your clients about your training style..."></textarea>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+              <i class="fa-solid fa-floppy-disk"></i> Update Profile Details
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ==================== TRAINER HUB VIEW ==================== -->
+      <section class="view-section" id="view-trainer-hub">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2 style="font-family: var(--font-heading);">Client Management Roster</h2>
+          <button class="btn btn-primary" onclick="TrainerHub.openAddClientModal()">
+            <i class="fa-solid fa-user-plus"></i> Add Client
+          </button>
+        </div>
+        <div id="traineesListContainer" class="grid-2">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </section>
+
+      <!-- ==================== TRAINER WORKOUT PLANNER ==================== -->
+      <section class="view-section" id="view-planner">
+        <div class="welcome-banner" style="background: var(--grad-orange);">
+          <div class="banner-content">
+            <h2 class="banner-title">Custom Workout Planner 📝</h2>
+            <p class="banner-desc">Create personalized workout plans and assign them directly to your clients.</p>
+          </div>
+        </div>
+        <div style="margin-top: 24px;">
+          <form id="plannerForm" class="glass-card" style="padding: 24px;">
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label" for="planTitle">Workout Title</label>
+                <input type="text" class="form-control" id="planTitle" placeholder="e.g., Intense Full Body Blitz" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="planCategory">Category</label>
+                <select class="form-control" id="planCategory" required>
+                  <option value="weight_loss">Weight Loss</option>
+                  <option value="muscle_building">Muscle Building</option>
+                  <option value="cardio">Cardio</option>
+                  <option value="hiit">HIIT</option>
+                  <option value="flexibility">Flexibility</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label" for="planDuration">Duration (minutes)</label>
+                <input type="number" class="form-control" id="planDuration" placeholder="45" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="planCalories">Est. Calories Burned</label>
+                <input type="number" class="form-control" id="planCalories" placeholder="400" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="planAssignee">Assign to Trainee</label>
+              <select class="form-control" id="planAssignee" required>
+                <option value="">Loading trainees...</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="planDescription">Workout Description</label>
+              <textarea class="form-control" id="planDescription" rows="3" placeholder="Brief summary of this workout..." required></textarea>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 24px 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <h3 style="font-size: 16px; font-weight: 600;">Exercises</h3>
+              <button type="button" class="btn btn-secondary btn-sm" id="addExerciseBtn">
+                <i class="fa-solid fa-plus"></i> Add Exercise
+              </button>
+            </div>
+            <div id="plannerExercisesContainer">
+              <!-- Dynamically populated rows -->
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 24px; font-size: 16px; padding: 12px;">
+              <i class="fa-solid fa-paper-plane"></i> Create & Assign Workout Plan
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ==================== COACH ADVICE VIEW (MEMBER) ==================== -->
+      <section class="view-section" id="view-messages">
+        <div class="welcome-banner" style="background: var(--grad-emerald);">
+          <div class="banner-content">
+            <h2 class="banner-title">Coach Advice & Messages 💬</h2>
+            <p class="banner-desc">Read the latest tips, plans, and motivation sent by your dedicated fitness coach.</p>
+          </div>
+        </div>
+        <div id="messagesFeedContainer" style="display: flex; flex-direction: column; gap: 16px; margin-top: 24px;">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- WORKOUT DETAIL MODAL WITH TIMER -->
+  <div class="modal-backdrop" id="workoutDetailModal">
+    <div class="modal-container">
+      <button class="modal-close" id="workoutModalClose"><i class="fa-solid fa-xmark"></i></button>
+
+      <h2 style="font-family: var(--font-heading); font-size: 22px; margin-bottom: 6px;" id="modalWorkoutTitle">Workout Title</h2>
+      <p style="font-size: 13px; color: var(--text-muted);" id="modalWorkoutDesc">Workout description here.</p>
+
+      <div style="display:flex; gap: 16px; margin: 16px 0; font-size: 13px; font-weight:600; color: var(--secondary);">
+        <span><i class="fa-solid fa-fire"></i> <span id="modalCalories">300 kcal</span></span>
+        <span><i class="fa-regular fa-clock"></i> <span id="modalDuration">25 min</span></span>
+      </div>
+
+      <!-- Exercise Countdown Timer -->
+      <div class="timer-display-box">
+        <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Session Timer</div>
+        <div class="timer-countdown" id="modalTimerCountdown">25:00</div>
+        <button class="btn btn-secondary btn-sm" id="timerToggleBtn" style="margin-top: 10px;">
+          <i class="fa-solid fa-play"></i> Start Timer
+        </button>
+      </div>
+
+      <!-- Exercises Step List -->
+      <h3 style="font-size: 15px; font-weight:700; margin-bottom: 12px; color: var(--text-main);">Exercise Breakdown:</h3>
+      <div id="modalExerciseList">
+        <!-- Loaded dynamically -->
+      </div>
+
+      <button class="btn btn-primary" id="finishWorkoutBtn" style="width: 100%; margin-top: 20px;">
+        <i class="fa-solid fa-check"></i> Complete Workout & Burn Calories
+      </button>
+    </div>
+  </div>
+
+  <!-- AUTHENTICATION MODAL (LOGIN & REGISTER) -->
+  <div class="modal-backdrop" id="authModal">
+    <div class="modal-container" style="max-width: 440px;">
+      <button class="modal-close" id="authModalClose"><i class="fa-solid fa-xmark"></i></button>
+
+      <!-- ROLE SELECTOR -->
+      <div class="role-selector" style="display: flex; background: var(--bg-dark); border-radius: 8px; padding: 4px; margin-bottom: 20px;">
+        <button id="roleBtnMember" class="btn-role active" style="flex:1; border:none; background:transparent; color: var(--text-muted); padding: 8px; border-radius: 6px; cursor: pointer; transition: all 0.3s; font-weight: 600;">🏃 Member</button>
+        <button id="roleBtnTrainer" class="btn-role" style="flex:1; border:none; background:transparent; color: var(--text-muted); padding: 8px; border-radius: 6px; cursor: pointer; transition: all 0.3s; font-weight: 600;">🏋️‍♂️ Trainer</button>
+      </div>
+
+      <!-- LOGIN BOX -->
+      <div id="loginBox">
+        <h2 style="font-family: var(--font-heading); font-size: 22px; margin-bottom: 6px;">Welcome Back 👋</h2>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Sign in to sync your fitness progress</p>
+
+        <form id="loginForm">
+          <div class="form-group">
+            <label class="form-label" for="loginEmail">Email Address</label>
+            <input type="email" class="form-control" id="loginEmail" placeholder="student@college.edu" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="loginPassword">Password</label>
+            <input type="password" class="form-control" id="loginPassword" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+        </form>
+
+        <button type="button" class="btn btn-secondary btn-sm" id="fillDemoLoginBtn" style="width: 100%; margin-top: 10px; font-size: 12px; background: rgba(6,182,212,0.1); border-color: rgba(6,182,212,0.3); color: var(--secondary);">
+          <i class="fa-solid fa-bolt"></i> Fast Demo: Member (Alex Morgan)
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" id="fillTrainerLoginBtn" style="width: 100%; margin-top: 8px; font-size: 12px; background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3); color: var(--accent-orange);">
+          <i class="fa-solid fa-crown"></i> Fast Demo: Trainer (Coach Marcus)
+        </button>
+
+        <div style="text-align: center; margin-top: 16px; font-size: 13px; color: var(--text-muted);">
+          Don't have an account? <a href="#" id="toggleToRegister" style="color: var(--secondary); font-weight:600;">Create Account</a>
+        </div>
+      </div>
+
+      <!-- REGISTER BOX -->
+      <div id="registerBox" style="display: none;">
+        <h2 style="font-family: var(--font-heading); font-size: 22px; margin-bottom: 6px;">Create Account 🚀</h2>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Start tracking your fitness transformation</p>
+
+        <form id="registerForm">
+          <div class="form-group">
+            <label class="form-label" for="regName">Full Name</label>
+            <input type="text" class="form-control" id="regName" placeholder="Alex Morgan" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regEmail">Email Address</label>
+            <input type="email" class="form-control" id="regEmail" placeholder="alex@college.edu" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regPassword">Password</label>
+            <input type="password" class="form-control" id="regPassword" placeholder="Min 6 characters" minlength="6" required>
+          </div>
+          <div id="memberRegFields">
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label" for="regWeight">Weight (kg)</label>
+                <input type="number" step="0.1" class="form-control" id="regWeight" placeholder="70">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="regHeight">Height (cm)</label>
+                <input type="number" step="0.1" class="form-control" id="regHeight" placeholder="175">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="regGoal">Fitness Target</label>
+              <select class="form-control" id="regGoal">
+                <option value="weight_loss">Weight Loss</option>
+                <option value="muscle_gain">Muscle Building</option>
+                <option value="maintenance">Maintenance</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="trainerRegFields" style="display: none;">
+            <div class="form-group">
+              <label class="form-label" for="regSpecialization">Specialization</label>
+              <input type="text" class="form-control" id="regSpecialization" placeholder="e.g., Strength Coach">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="regExperience">Years of Experience</label>
+              <input type="number" class="form-control" id="regExperience" placeholder="5">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="regBio">Short Bio / Certification</label>
+              <input type="text" class="form-control" id="regBio" placeholder="NASM Certified...">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Create Free Account</button>
+        </form>
+
+        <div style="text-align: center; margin-top: 16px; font-size: 13px; color: var(--text-muted);">
+          Already registered? <a href="#" id="toggleToLogin" style="color: var(--secondary); font-weight:600;">Sign In</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD CLIENT MODAL -->
+  <div class="modal-backdrop" id="addClientModal">
+    <div class="modal-container" style="max-width: 400px;">
+      <button class="modal-close" onclick="document.getElementById('addClientModal').classList.remove('active')"><i class="fa-solid fa-xmark"></i></button>
+      <h2 style="font-family: var(--font-heading); font-size: 20px; margin-bottom: 16px;">Add Client to Roster</h2>
+      <div class="form-group">
+        <label class="form-label" for="addClientEmail">Client Email Address</label>
+        <input type="email" class="form-control" id="addClientEmail" placeholder="demo@pulsefit.com">
+      </div>
+      <button class="btn btn-primary" style="width: 100%;" onclick="TrainerHub.submitAddClient()">Add Client</button>
+    </div>
+  </div>
+
+  <!-- SEND ADVICE MODAL -->
+  <div class="modal-backdrop" id="sendAdviceModal">
+    <div class="modal-container" style="max-width: 440px;">
+      <button class="modal-close" onclick="document.getElementById('sendAdviceModal').classList.remove('active')"><i class="fa-solid fa-xmark"></i></button>
+      <h2 style="font-family: var(--font-heading); font-size: 20px; margin-bottom: 16px;">Send Advice to Client</h2>
+      <div class="form-group">
+        <label class="form-label" for="adviceContent">Coach Note / Advice</label>
+        <textarea class="form-control" id="adviceContent" rows="4" placeholder="Great job on your macros! Keep pushing..."></textarea>
+      </div>
+      <button class="btn btn-primary" style="width: 100%;" onclick="TrainerHub.submitAdvice()">Send Advice</button>
+    </div>
+  </div>
+
+  <!-- HISTORY MODAL -->
+  <div class="modal-backdrop" id="historyModal">
+    <div class="modal-container" style="max-width: 500px; max-height: 80vh; overflow-y: auto;">
+      <button class="modal-close" onclick="document.getElementById('historyModal').classList.remove('active')"><i class="fa-solid fa-xmark"></i></button>
+      <h2 style="font-family: var(--font-heading); font-size: 20px; margin-bottom: 16px;">Client Progress History</h2>
+      <div id="historyContentContainer" style="display: flex; flex-direction: column; gap: 12px;">
+        <!-- Populated via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- JavaScript Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/bmi.js"></script>
+  <script src="js/workouts.js"></script>
+  <script src="js/diet.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/profile.js"></script>
+  <script src="js/trainer.js"></script>
+  <script src="js/planner.js"></script>
+  <script src="js/messages.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
