@@ -117,7 +117,7 @@ const Auth = {
         const weightKg = document.getElementById('regWeight') ? document.getElementById('regWeight').value : '';
         const heightCm = document.getElementById('regHeight') ? document.getElementById('regHeight').value : '';
         const fitnessGoal = document.getElementById('regGoal') ? document.getElementById('regGoal').value : '';
-        
+
         const specialization = document.getElementById('regSpecialization') ? document.getElementById('regSpecialization').value : '';
         const experienceYears = document.getElementById('regExperience') ? document.getElementById('regExperience').value : '';
         const bio = document.getElementById('regBio') ? document.getElementById('regBio').value : '';
@@ -187,7 +187,7 @@ const Auth = {
       if (userQuickName) userQuickName.textContent = user.name || 'Member';
       if (userQuickAvatar) userQuickAvatar.textContent = user.avatar || '⚡';
       if (welcomeUserName) welcomeUserName.textContent = user.name || 'Member';
-      
+
       const dashTrainerName = document.getElementById('dashTrainerName');
       if (dashTrainerName) dashTrainerName.textContent = user.name || 'Coach';
 
